@@ -47,20 +47,20 @@ export const loginUser = async (req, res) => {
 export const createUser = async (req, res) => {
     try {
         
-        const {email, password, passwordVerify} = req.body;
-        if (!email || !password || !passwordVerify) {
+        const {firstName, lastName, email, password, passwordVerify} = req.body;
+        if (!firstName || !lastName || !email || !password || !passwordVerify) {
             return res.status(400).json({
                 errorMessage:"Please enter all required fields"
             })
         }
         
         if (password.length < 6){
-            res.status(400).json({
+            return res.status(400).json({
                 errorMessage: "Please Enter at least 6 character password"
             })
         }
         if (passwordVerify!==password){
-            res.status(400).json({
+            return res.status(400).json({
                 errorMessage: "Passwords don't match"
             })
         }
@@ -74,11 +74,9 @@ export const createUser = async (req, res) => {
         const salt = await bcrypt.genSalt();
         const passwordHash = await bcrypt.hash(password, salt)
 
-        console.log(passwordHash)
-        console.log(exisitingUser)
 
         const newUser = new User({
-            "email":email, "password": passwordHash
+            name: {"first_name": firstName, "last_name": lastName}, "email":email, "password": passwordHash
         })
 
         const savedUser = await newUser.save();
@@ -87,7 +85,6 @@ export const createUser = async (req, res) => {
             user: savedUser._id
         }, process.env.JWT_SECRET)
         
-        console.log(token)
 
         res.cookie("token", token, {
             httponly:true,
