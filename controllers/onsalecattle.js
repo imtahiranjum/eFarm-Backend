@@ -11,6 +11,19 @@ export const getOnSaleCattle = async (req, res) => {
       res.status(404).json({ message: error.message });
     }
   };
+export const getOneOnSaleCattle = async (req, res) => {
+    try {
+      const { id } = req.params;
+      console.log(id);
+      const onSaleCattle = await OnSaleCattle.findOne(id).populate('questions');
+
+      console.log(onSaleCattle)
+  
+      res.status(200).json(onSaleCattle);
+    } catch (error) {
+      res.status(404).json({ message: error.message });
+    }
+  };
 
   export const addCattleToSale = async (req, res) => {
     try {
