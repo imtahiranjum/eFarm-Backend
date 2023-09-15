@@ -1,9 +1,10 @@
 import express from "express";
-import { addCattleToSale, getOnSaleCattle } from "../controllers/onsalecattle.js";
+import { addCattleToSale, getOnSaleCattle, getOneOnSaleCattle } from "../controllers/onsalecattle.js";
 
 const router = express.Router();
 
-router.get("/onsalecattle", getOnSaleCattle);
+router.get("/", getOnSaleCattle);
+router.get("/specificonsalecattle", getOneOnSaleCattle);
 router.post("/addcattletosale", addCattleToSale);
 
 export default router;
