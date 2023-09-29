@@ -11,6 +11,10 @@ const CattleSchema = new mongoose.Schema(
         type: String,
         required: true,
     },
+
+    images: {
+      type: Array,
+    },
     
     breed: {
         type: String,
@@ -20,7 +24,7 @@ const CattleSchema = new mongoose.Schema(
     color: {
         type: String,
         required: true,
-    },
+      },
     weight: {
         type: String,
         required: true,
@@ -33,6 +37,14 @@ const CattleSchema = new mongoose.Schema(
 
     is_boarded: {
         type: Boolean,
+      },
+      
+    category: {
+      type: String
+    },
+    
+    is_onsale: {
+      type: Boolean
     },
 
     health: {
@@ -49,7 +61,6 @@ const CattleSchema = new mongoose.Schema(
         type: Schema.Types.ObjectId,
         ref: "Device",
       },
-
 
     farm: {
       type: Schema.Types.ObjectId,
