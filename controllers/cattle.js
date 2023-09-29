@@ -1,64 +1,77 @@
-import Cattle from "../models/Cattle.js"
+import Cattle from "../models/Cattle.js";
 
-export const getCattle = async (req, res) => {
-    try{
-        
-    }
-    catch (err){
-        return res.status(400).json({
-            errorMessage: err
-        })
+export const getAllCattle = async (req, res) => {
+  try {
+    const allCattle = await Cattle.find({});
+    res.status(200).json(allCattle);
+  } catch (err) {
+    return res.status(400).json({
+      errorMessage: err,
+    });
+  }
+};
 
-    }
-
-}
+export const getOneCattle = async (req, res) => {
+  try {
+    const {id} = req.params;
+    const oneCattle = await Cattle.find(id);
+    res.status(200).json(oneCattle);
+  } catch (err) {
+    return res.status(400).json({
+      errorMessage: err,
+    });
+  }
+};
 
 export const createCattle = async (req, res) => {
-    try{
-        const {name, gender, age, breed, color, weight} = req.body
+  try {
+    const { name, images, gender, age, breed, color, weight, category } =
+      req.body;
 
-        const lowerCaseGender = gender.toLowerCase();
-        console.log(lowerCaseGender);
+    const lowerCaseGender = gender.toLowerCase();
 
-        if (!name || !gender || !breed || !color || !weight)
-        return res.status(400).json({
-            errorMessage: "Please fill all the required fields"
-        });
+    if (!name || !gender || !breed || !color || !weight || !category)
+      return res.status(400).json({
+        errorMessage: "Please fill all the required fields",
+      });
 
-        if (name.Length > 25)
-        return res.status(400).json({
-            errorMessage: "Name length too much"
-        });
+    if (!images)
+      return res.status(400).json({
+        errorMessage: "Please select at least one image of cattle",
+      });
 
-        // if (lowerCaseGender != "male" || lowerCaseGender !== "female")
-        // return res.status(400).json({
-        //     errorMessage: "gender is not set correct"
-        // });
+    if (name.Length > 25)
+      return res.status(400).json({
+        errorMessage: "Name length too much",
+      });
 
-        if (0 > weight > 10000 )
-        return res.status(400).json({
-            errorMessage: "incorrect weight"
-        });
+    // if (lowerCaseGender != "male" || lowerCaseGender !== "female")
+    // return res.status(400).json({
+    //     errorMessage: "gender is not set correct"
+    // });
 
-        const newCattle = await Cattle({
-            "name": name,
-            "gender": gender,
-            "breed": breed,
-            "color": color,
-            "weight": weight,
-            "age":age,
-        });
+    if (0 > weight > 10000)
+      return res.status(400).json({
+        errorMessage: "incorrect weight",
+      });
 
-        const savedCattle = await newCattle.save();
+    const newCattle = await Cattle({
+      name: name,
+      images: images,
+      gender: gender,
+      breed: breed,
+      color: color,
+      weight: weight,
+      age: age,
+    });
 
-        res.status(200).json(savedCattle)
-    }
-    
-    catch (err){
-        return res.status(500).json({
-            errorMessage: err
-        })
+    const savedCattle = await newCattle.save();
 
-    }
+    res.status(200).json(savedCattle);
+  } catch (err) {
+    return res.status(500).json({
+      errorMessage: err,
+    });
+  }
+};
 
-}
