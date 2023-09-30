@@ -14,18 +14,16 @@ const OnSaleCattleSchema = new mongoose.Schema(
 
     location: {
         type: String,
-        required: true,
         min: 10,
     },
     
     contact: {
         type: String,
-        required: true,
     },
 
     category: {
         type: String,
-        required: true,
+
     },
     
     price: {
@@ -42,7 +40,6 @@ const OnSaleCattleSchema = new mongoose.Schema(
     questions: [{
         type: Schema.Types.ObjectId,
         ref: "Question",
-        required: true,
       }],
   },
   { timestamps: true }
