@@ -2,6 +2,46 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
 
+export const getUser = async (req, res) => {
+    try{
+        const id = req.params.id
+        const email = req.body.email;
+
+        console.log(id);
+        if ( !id || !email ) {
+            return res.status(401).json({
+                errorMessage:"No id or email given"
+            })
+    }
+
+    if (id) {
+        const user = await User.findById(id)
+        if (!user)
+            return res.status(401).json({
+                errorMessage:"Wrong email or user does not exist on the machine"
+        })
+        return res.status(200).json(user)
+    }
+    else {
+        const user = await User.findOne({"email": email})
+        
+        if (!user)
+            return res.status(401).json({
+                errorMessage:"Wrong email or user does not exist on the machine"
+            })
+            return res.status(200).json(user)
+    }
+
+
+    }
+    catch (err){
+        return res.status(400).json({
+            errorMessage: "Wrong email or password"
+        })
+
+    }
+}
+
 export const loginUser = async (req, res) => {
     try{
         const {email, password} = req.body;
