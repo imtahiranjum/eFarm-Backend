@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken"
 
 export const getUser = async (req, res) => {
     try{
-        const id = req.params.id
+        const id = req.body.id
         const email = req.body.email;
 
         console.log(id);
@@ -32,6 +32,33 @@ export const getUser = async (req, res) => {
             return res.status(200).json(user)
     }
 
+
+    }
+    catch (err){
+        return res.status(400).json({
+            errorMessage: "Wrong email or password"
+        })
+
+    }
+}
+
+export const getUserId = async (req, res) => {
+    try{
+        const id = req.body.id
+
+        console.log(id);
+        if ( !id  ) {
+            return res.status(401).json({
+                errorMessage:"No id or email given"
+            })
+    }
+
+    const user = await User.findById(id)
+        if (!user)
+            return res.status(401).json({
+                errorMessage:"user does not exist on the system"
+        })
+        return res.status(200).json(user)
 
     }
     catch (err){
