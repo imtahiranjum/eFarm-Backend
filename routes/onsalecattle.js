@@ -4,7 +4,7 @@ import { addCattleToSale, getAllOnSaleCattle, getOneOnSaleCattle, removeCattleFr
 const router = express.Router();
 
 router.get("/", getAllOnSaleCattle);
-router.get("/specificonsalecattle", getOneOnSaleCattle);
+router.get("/specificonsalecattle/:id", getOneOnSaleCattle);
 router.post("/addcattletosale", addCattleToSale);
 router.patch("/updatecattleonsalestatus/:cattle_id&:to_add", updateCattleOnSaleStatus);
 router.delete("/removefromsale/:id", removeCattleFromSale)
