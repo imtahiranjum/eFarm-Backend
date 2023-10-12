@@ -14,7 +14,7 @@ export const getAllOnSaleCattle = async (req, res) => {
 };
 export const getOneOnSaleCattle = async (req, res) => {
   try {
-    const { cattle_id } = req.body;
+    const cattle_id = req.params.id;
     console.log(id);
     const onSaleCattle = await OnSaleCattle.findOne(cattle_id).populate(
       "questions"
