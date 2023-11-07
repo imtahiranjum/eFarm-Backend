@@ -1,11 +1,11 @@
+import multer from "multer";
 import Cattle from "../models/Cattle.js";
 import OnSaleCattle from "../models/OnSaleCattle.js";
+import Seller from "../models/Seller.js";
 
 export const getAllOnSaleCattle = async (req, res) => {
   try {
-    const onSaleCattle = await OnSaleCattle.find({}).populate("questions");
-
-    console.log(onSaleCattle);
+    const onSaleCattle = await OnSaleCattle.find({});
 
     res.status(200).json(onSaleCattle);
   } catch (error) {
@@ -20,9 +20,30 @@ export const getOneOnSaleCattle = async (req, res) => {
       "questions"
     );
 
-    console.log(onSaleCattle);
-
     res.status(200).json(onSaleCattle);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+};
+export const getOneOnSaleCattleImages = async (req, res) => {
+  try {
+    const on_sale_cattle_id = req.params.id;
+    const cattle = await Cattle.findById(on_sale_cattle_id);
+
+    res.status(200).json(cattle.images);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+};
+export const getOneOnSaleCattleDetails = async (req, res) => {
+  try {
+    const on_sale_cattle_id = req.params.id;
+    const onSaleCattle = await OnSaleCattle.findById(on_sale_cattle_id);
+    const cattle = await Cattle.findById(onSaleCattle.cattle_info);
+    const seller = await Seller.findById(onSaleCattle.seller_info);
+    const images = cattle.images
+
+    res.status(200).json({seller, images});
   } catch (error) {
     res.status(404).json({ message: error.message });
   }
@@ -58,7 +79,7 @@ export const updateCattleOnSaleStatus = async (req, res) => {
 
 export const addCattleToSale = async (req, res) => {
   try {
-    const { title, description, price, cattle_id } = req.body;
+    const { title, description, price, cattle_id, images } = req.body;
 
     if (!title || !description || !price || !cattle_id)
       return res.status(400).json({
@@ -85,6 +106,7 @@ export const addCattleToSale = async (req, res) => {
       description: description,
       price: price,
       cattle_info: cattle_id,
+      images: images,
     });
 
     const savedOnSaleCattle = await newOnSaleCattle.save();
@@ -100,8 +122,9 @@ export const addCattleToSale = async (req, res) => {
 export const removeCattleFromSale = async (req, res) => {
   try {
     const id = req.params.id;
-    const cattleToRemoveFromSale = await OnSaleCattle.findOneAndDelete(
-      { cattle_info: id });
+    const cattleToRemoveFromSale = await OnSaleCattle.findOneAndDelete({
+      cattle_info: id,
+    });
 
     res.status(200).json(cattleToRemoveFromSale);
   } catch (error) {
