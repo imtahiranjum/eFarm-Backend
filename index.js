@@ -13,27 +13,20 @@ import managementRoutes from "./routes/management.js"
 import cattleRoutes from "./routes/cattle.js"
 import userRoutes from "./routes/user.js"
 import onsalecattleRoutes from "./routes/onsalecattle.js"
-
-import Cattle from './models/Cattle.js';
-import Question from './models/Question.js';
-import User from './models/User.js';
-import Staff from './models/Staff.js';
-import Doctor from './models/Doctor.js';
-
-import { dataProduct, dataCattle, dataUser, dataQuestions, dataStaff, dataDoctor } from "./data/index.js"
 import cookieParser from 'cookie-parser';
 
 dotenv.config();
 const app = express();
-app.use(express.json());
 app.use(cookieParser());
 app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({policy: "cross-origin"}));
 
 app.use(morgan("common"));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 app.use(cors());
+app.use(express.json());
+app.use(express.static('public'));
 
 app.use("/client", clientRoutes);
 app.use("/general", generalRoutes);
@@ -74,13 +67,5 @@ mongoose.connect(process.env.MONGO_URL, {
     useUnifiedTopology: true
 }).then(() => {
     app.listen(PORT, ()=> console.log(`Server Port: ${PORT}`))
-    // console.log(`data inserting`)
-    // Product.insertMany(dataProduct);
-    // Cattle.insertMany(dataCattle);
-    // User.insertMany(dataUser);
-    // Question.insertMany(dataQuestions);
-    // Staff.insertMany(dataStaff);
-    // Doctor.insertMany(dataDoctor);
-    // console.log(`data inserted`)
 
 }).catch((error) => console.log(`${error} did not connect`));
