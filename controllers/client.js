@@ -1,7 +1,6 @@
 
 import Staff from "../models/Staff.js";
 import User from "../models/User.js";
-import Doctor from "../models/Doctor.js";
 
 
 export const getStaff = async (req, res) => {
@@ -63,14 +62,3 @@ export const getEmployee = async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 };
-
-export const getDoctor = async (req, res) => {
-  try {
-    const doctor = await Doctor.find({}).select("-password");
-    res.status(200).json(doctor);
-  } catch (error) {
-    res.status(404).json({ message: error.message });
-  }
-};
-
-
