@@ -39,7 +39,7 @@ export const getUserByEmail = async (req, res) => {
       return res.status(400).json({
         errorMessage: "Wrong email or user does not exist on the machine",
       });
-    return res.status(200).json( {id: user._id, first_name: user.name.first_name, email: user.email});
+    return res.status(200).json( {id: user._id, first_name: user.name.first_name, email: user.email, roles: user.roles});
   } catch (err) {
     return res.status(400).json({
       errorMessage: "Wrong email",
