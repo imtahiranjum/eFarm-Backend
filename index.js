@@ -9,7 +9,6 @@ import { Server } from 'http';
 
 import clientRoutes from "./routes/client.js"
 import generalRoutes from "./routes/general.js"
-import managementRoutes from "./routes/management.js"
 import cattleRoutes from "./routes/cattle.js"
 import userRoutes from "./routes/user.js"
 import onsalecattleRoutes from "./routes/onsalecattle.js"
@@ -30,7 +29,6 @@ app.use(express.static('public'));
 
 app.use("/client", clientRoutes);
 app.use("/general", generalRoutes);
-app.use("/management", managementRoutes);
 app.use("/cattle", cattleRoutes);
 app.use("/user", userRoutes);
 app.use("/onsalecattle", onsalecattleRoutes);
