@@ -1,4 +1,5 @@
 import User from "../models/User.js";
+import Seller from "../models/Seller.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
@@ -18,7 +19,11 @@ export const getUser = async (req, res) => {
       return res.status(401).json({
         errorMessage: "Wrong email or user does not exist on the machine",
       });
-    return res.status(200).json({id: user._id, first_name: user.name.first_name, email: user.email});
+    return res.status(200).json({
+      id: user._id,
+      first_name: user.name.first_name,
+      email: user.email,
+    });
   } catch (err) {
     return res.status(400).json({
       errorMessage: "Wrong email or password",
@@ -34,12 +39,17 @@ export const getUserByEmail = async (req, res) => {
       });
     }
 
-    const user = await User.findOne({email: email});
+    const user = await User.findOne({ email: email });
     if (user === undefined)
       return res.status(400).json({
         errorMessage: "Wrong email or user does not exist on the machine",
       });
-    return res.status(200).json( {id: user._id, first_name: user.name.first_name, email: user.email, roles: user.roles});
+    return res.status(200).json({
+      id: user._id,
+      first_name: user.name.first_name,
+      email: user.email,
+      roles: user.roles,
+    });
   } catch (err) {
     return res.status(400).json({
       errorMessage: "Wrong email",
@@ -165,6 +175,49 @@ export const createUser = async (req, res) => {
         httponly: true,
       })
       .send();
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+};
+export const createSeller = async (req, res) => {
+  try {
+    const {name, displayName, description, rating, contact_info } = req.body;
+    // if (!name, !displayName || !description || !rating || !contact_info) {
+    //   return res.status(400).json({
+    //     errorMessage: "all required fields not entered",
+    //   });
+    // }
+    console.log(req.body);
+    if (description.length < 50) {
+      return res.status(400).json({
+        errorMessage: "Please Enter at least 10 character description",
+      });
+    }
+    // if (passwordVerify !== password) {
+    //   return res.status(400).json({
+    //     errorMessage: "Passwords don't match",
+    //   });
+    // }
+
+    const exisitingSeller = await Seller.findOne({ contact_info: contact_info });
+    if (exisitingSeller)
+      return res.status(400).json({
+        errorMessage: "Seller already exists",
+      });
+
+    const newSeller = new Seller({
+      name: name,
+      display_name: displayName,
+      description: description,
+      rating: rating,
+      contact_info: {
+        phone_number: contact_info.phone_number,
+        address: contact_info.address,
+      }
+    });
+
+    const savedSeller = await newSeller.save();
+    res.status(200).json(savedSeller);
   } catch (error) {
     res.status(404).json({ message: error.message });
   }
