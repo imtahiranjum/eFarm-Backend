@@ -41,6 +41,11 @@ const SellerSchema = new mongoose.Schema(
       },
     },
 
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
+
     expired_boarding_services: [
       {
         type: Schema.Types.ObjectId,
