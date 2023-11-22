@@ -181,7 +181,7 @@ export const createUser = async (req, res) => {
 };
 export const createSeller = async (req, res) => {
   try {
-    const {name, displayName, description, rating, contact_info } = req.body;
+    const {name, displayName, description, rating, contact_info, userEmail } = req.body;
     // if (!name, !displayName || !description || !rating || !contact_info) {
     //   return res.status(400).json({
     //     errorMessage: "all required fields not entered",
@@ -205,6 +205,16 @@ export const createSeller = async (req, res) => {
         errorMessage: "Seller already exists",
       });
 
+    const exisitingUser = await User.findOne({ email: userEmail });
+    if (!exisitingUser)
+      return res.status(400).json({
+        errorMessage: "User does not exist",
+      });
+
+    const updatedUser = await User.findByIdAndUpdate(exisitingUser._id, {
+      roles: ["seller"],
+    })
+
     const newSeller = new Seller({
       name: name,
       display_name: displayName,
@@ -213,7 +223,8 @@ export const createSeller = async (req, res) => {
       contact_info: {
         phone_number: contact_info.phone_number,
         address: contact_info.address,
-      }
+      },
+      user: exisitingUser._id,
     });
 
     const savedSeller = await newSeller.save();
