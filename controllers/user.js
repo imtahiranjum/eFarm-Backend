@@ -2,6 +2,7 @@ import User from "../models/User.js";
 import Seller from "../models/Seller.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import Profile from "../models/Profile.js";
 
 export const getUser = async (req, res) => {
   try {
@@ -14,7 +15,7 @@ export const getUser = async (req, res) => {
       });
     }
 
-    const user = await User.findById(id);
+    const user = await User.findById(id).populate("profile");
     if (user === undefined)
       return res.status(401).json({
         errorMessage: "Wrong email or user does not exist on the machine",
@@ -23,6 +24,7 @@ export const getUser = async (req, res) => {
       id: user._id,
       first_name: user.name.first_name,
       email: user.email,
+      profile: user.profile,
     });
   } catch (err) {
     return res.status(400).json({
@@ -39,7 +41,7 @@ export const getUserByEmail = async (req, res) => {
       });
     }
 
-    const user = await User.findOne({ email: email });
+    const user = await User.findOne({ email: email }).populate("profile");
     if (user === undefined)
       return res.status(400).json({
         errorMessage: "Wrong email or user does not exist on the machine",
@@ -49,10 +51,57 @@ export const getUserByEmail = async (req, res) => {
       first_name: user.name.first_name,
       email: user.email,
       roles: user.roles,
+      profile: user.profile,
     });
   } catch (err) {
     return res.status(400).json({
       errorMessage: "Wrong email",
+    });
+  }
+};
+export const getSellerById = async (req, res) => {
+  try {
+    const id = req.params.id;
+    console.log(id);
+    if (!id) {
+      return res.status(400).json({
+        errorMessage: "id wrong or not given",
+      });
+    }
+    const seller = await Seller.findById({ _id: id }).populate("user");
+    const profile = await Profile.findOne({ user: seller.user._id });
+
+    if (seller === undefined)
+      return res.status(400).json({
+        errorMessage: "Wrong email or user does not exist on the machine",
+      });
+    return res.status(200).json({seller, profile});
+  } catch (err) {
+    return res.status(400).json({
+      errorMessage: "Something went wrong" + err,
+    });
+  }
+};
+export const getSellerByEmail = async (req, res) => {
+  try {
+    const email = req.params.email;
+    if (!email) {
+      return res.status(400).json({
+        errorMessage: "email wrong or not given",
+      });
+    }
+    const user = await User.findOne({ email: email });
+    const seller = await Seller.findOne({ user: user._id });
+    const profile = await Profile.findOne({ user: user._id });
+
+    if (seller === undefined)
+      return res.status(400).json({
+        errorMessage: "Wrong email or user does not exist on the machine",
+      });
+    return res.status(200).json({seller, profile});
+  } catch (err) {
+    return res.status(400).json({
+      errorMessage: "Something went wrong" + err,
     });
   }
 };
@@ -155,12 +204,16 @@ export const createUser = async (req, res) => {
     const salt = await bcrypt.genSalt();
     const passwordHash = await bcrypt.hash(password, salt);
 
+    
     const newUser = new User({
       name: { first_name: firstName, last_name: lastName },
       email: email,
       password: passwordHash,
     });
-
+    
+    const newProfile = new Profile({ user: newUser._id });
+    
+    const savedUserProfile = await newProfile.save();
     const savedUser = await newUser.save();
 
     const token = jwt.sign(
