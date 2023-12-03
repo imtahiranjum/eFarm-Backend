@@ -12,6 +12,8 @@ import generalRoutes from "./routes/general.js"
 import cattleRoutes from "./routes/cattle.js"
 import userRoutes from "./routes/user.js"
 import onsalecattleRoutes from "./routes/onsalecattle.js"
+import conversationRoutes from "./routes/conversations.js"
+import messageRoutes from "./routes/messages.js"
 import cookieParser from 'cookie-parser';
 
 dotenv.config();
@@ -32,6 +34,9 @@ app.use("/general", generalRoutes);
 app.use("/cattle", cattleRoutes);
 app.use("/user", userRoutes);
 app.use("/onsalecattle", onsalecattleRoutes);
+app.use("/conversation", conversationRoutes);
+app.use("/message", messageRoutes);
+
 
 
 const PORT = process.env.PORT || 9000;
