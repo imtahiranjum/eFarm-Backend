@@ -66,6 +66,11 @@ const CattleSchema = new mongoose.Schema(
       type: Schema.Types.ObjectId,
       ref: "Farm",
     },
+    
+    seller: {
+      type: Schema.Types.ObjectId,
+      ref: "Seller",
+    },
   },
   { timestamps: true }
 );
