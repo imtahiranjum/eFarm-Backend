@@ -14,11 +14,13 @@ export const getAllOnSaleCattle = async (req, res) => {
 };
 export const getOneOnSaleCattle = async (req, res) => {
   try {
-    const cattle_id = req.params.id;
-    console.log(id);
-    const onSaleCattle = await OnSaleCattle.findOne(cattle_id).populate(
-      "questions"
-    );
+    const onSaleCattleId = req.params.id;
+    console.log(onSaleCattleId);
+    if (!onSaleCattleId)
+      return res.status(400).json({
+        errorMessage: "Please select a cattle",
+      });
+    const onSaleCattle = await OnSaleCattle.findById(onSaleCattleId);
 
     res.status(200).json(onSaleCattle);
   } catch (error) {
