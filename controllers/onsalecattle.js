@@ -5,7 +5,7 @@ import Seller from "../models/Seller.js";
 
 export const getAllOnSaleCattle = async (req, res) => {
   try {
-    const onSaleCattle = await OnSaleCattle.find({});
+    const onSaleCattle = await OnSaleCattle.find({}).populate("questions");
 
     res.status(200).json(onSaleCattle);
   } catch (error) {
@@ -27,25 +27,24 @@ export const getOneOnSaleCattle = async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 };
-export const getOneOnSaleCattleImages = async (req, res) => {
-  try {
-    const on_sale_cattle_id = req.params.id;
-    const cattle = await Cattle.findById(on_sale_cattle_id);
+// export const getOneOnSaleCattleImages = async (req, res) => {
+//   try {
+//     const on_sale_cattle_id = req.params.id;
+//     const cattle = await Cattle.findById(on_sale_cattle_id);
 
-    res.status(200).json(cattle.images);
-  } catch (error) {
-    res.status(404).json({ message: error.message });
-  }
-};
+//     res.status(200).json(cattle.images);
+//   } catch (error) {
+//     res.status(404).json({ message: error.message });
+//   }
+// };
+
 export const getOneOnSaleCattleDetails = async (req, res) => {
   try {
     const on_sale_cattle_id = req.params.id;
     const onSaleCattle = await OnSaleCattle.findById(on_sale_cattle_id);
-    const cattle = await Cattle.findById(onSaleCattle.cattle_info);
     const seller = await Seller.findById(onSaleCattle.seller_info);
-    const images = cattle.images
 
-    res.status(200).json({seller, images});
+    res.status(200).json({seller, onSaleCattle});
   } catch (error) {
     res.status(404).json({ message: error.message });
   }
@@ -81,22 +80,28 @@ export const updateCattleOnSaleStatus = async (req, res) => {
 
 export const addCattleToSale = async (req, res) => {
   try {
-    const { title, description, price, cattle_id, images } = req.body;
+    const { title, description, price, name, images, gender, age, breed, color, weight, category, seller_info  } = req.body;
+    console.log(req.body);
 
-    if (!title || !description || !price || !cattle_id)
+    if (!name ||!gender ||!breed ||!color ||!weight ||!category|| !age|| !title|| !description|| !price)
       return res.status(400).json({
         errorMessage: "Please fill all the required fields",
       });
 
-    // if (!images)
-    //   return res.status(400).json({
-    //     errorMessage: "Please select at least one image of cattle",
-    //   });
+    if (!images)
+      return res.status(400).json({
+        errorMessage: "Please select at least one image of cattle",
+      });
 
-    // if (lowerCaseGender != "male" || lowerCaseGender !== "female")
-    // return res.status(400).json({
-    //     errorMessage: "gender is not set correct"
-    // });
+    if (name.Length > 25)
+      return res.status(400).json({
+        errorMessage: "Name length too much",
+      });
+
+    if (0 > weight > 10000)
+      return res.status(400).json({
+        errorMessage: "incorrect weight",
+      });
 
     if (0 > price > 10000000)
       return res.status(400).json({
@@ -107,11 +112,21 @@ export const addCattleToSale = async (req, res) => {
       title: title,
       description: description,
       price: price,
-      cattle_info: cattle_id,
       images: images,
+      name: name,
+      images: images,
+      gender: gender,
+      breed: breed,
+      color: color,
+      weight: weight,
+      age: age,
+      seller_info: seller_info,
     });
 
     const savedOnSaleCattle = await newOnSaleCattle.save();
+
+    const sellerUpdate = await Seller.findOneAndUpdate( { _id: seller_info }, { $push: { cattle_on_sale: savedOnSaleCattle._id } } )
+    await sellerUpdate.save();
 
     res.status(200).json(savedOnSaleCattle);
   } catch (err) {
