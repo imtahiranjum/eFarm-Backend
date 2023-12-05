@@ -44,12 +44,7 @@ export const createCattle = async (req, res) => {
       return res.status(400).json({
         errorMessage: "Name length too much",
       });
-
-    // if (lowerCaseGender != "male" || lowerCaseGender !== "female")
-    // return res.status(400).json({
-    //     errorMessage: "gender is not set correct"
-    // });
-
+      
     if (0 > weight > 10000)
       return res.status(400).json({
         errorMessage: "incorrect weight",
