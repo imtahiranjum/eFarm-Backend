@@ -41,7 +41,8 @@ export const getUserByEmail = async (req, res) => {
       });
     }
 
-    const user = await User.findOne({ email: email }).populate("profile");
+    const user = await User.findOne({ email: email })
+    const profile = await Profile.findOne({ user: user._id });
     if (user === undefined)
       return res.status(400).json({
         errorMessage: "Wrong email or user does not exist on the machine",
@@ -51,7 +52,7 @@ export const getUserByEmail = async (req, res) => {
       first_name: user.name.first_name,
       email: user.email,
       roles: user.roles,
-      profile: user.profile,
+      profile: profile,
     });
   } catch (err) {
     return res.status(400).json({
@@ -75,7 +76,7 @@ export const getSellerById = async (req, res) => {
       return res.status(400).json({
         errorMessage: "Wrong email or user does not exist on the machine",
       });
-    return res.status(200).json({seller, profile});
+    return res.status(200).json({ seller, profile });
   } catch (err) {
     return res.status(400).json({
       errorMessage: "Something went wrong" + err,
@@ -91,14 +92,14 @@ export const getSellerByEmail = async (req, res) => {
       });
     }
     const user = await User.findOne({ email: email });
-    const seller = await Seller.findOne({ user: user._id });
+    const seller = await Seller.findOne({ user: user._id }).populate("user");
     const profile = await Profile.findOne({ user: user._id });
 
     if (seller === undefined)
       return res.status(400).json({
         errorMessage: "Wrong email or user does not exist on the machine",
       });
-    return res.status(200).json({seller, profile});
+    return res.status(200).json({ seller, profile });
   } catch (err) {
     return res.status(400).json({
       errorMessage: "Something went wrong" + err,
@@ -204,15 +205,14 @@ export const createUser = async (req, res) => {
     const salt = await bcrypt.genSalt();
     const passwordHash = await bcrypt.hash(password, salt);
 
-    
     const newUser = new User({
       name: { first_name: firstName, last_name: lastName },
       email: email,
       password: passwordHash,
     });
-    
+
     const newProfile = new Profile({ user: newUser._id });
-    
+
     const savedUserProfile = await newProfile.save();
     const savedUser = await newUser.save();
 
@@ -234,7 +234,8 @@ export const createUser = async (req, res) => {
 };
 export const createSeller = async (req, res) => {
   try {
-    const {name, displayName, description, rating, contact_info, userEmail } = req.body;
+    const { name, displayName, description, rating, contact_info, userEmail } =
+      req.body;
     // if (!name, !displayName || !description || !rating || !contact_info) {
     //   return res.status(400).json({
     //     errorMessage: "all required fields not entered",
@@ -252,7 +253,9 @@ export const createSeller = async (req, res) => {
     //   });
     // }
 
-    const exisitingSeller = await Seller.findOne({ contact_info: contact_info });
+    const exisitingSeller = await Seller.findOne({
+      contact_info: contact_info,
+    });
     if (exisitingSeller)
       return res.status(400).json({
         errorMessage: "Seller already exists",
@@ -266,7 +269,7 @@ export const createSeller = async (req, res) => {
 
     const updatedUser = await User.findByIdAndUpdate(exisitingUser._id, {
       roles: ["seller"],
-    })
+    });
 
     const newSeller = new Seller({
       name: name,
@@ -278,8 +281,10 @@ export const createSeller = async (req, res) => {
         address: contact_info.address,
       },
       user: exisitingUser._id,
+      cattle_on_sale: [],
     });
 
+    const savedUser = await updatedUser.save();
     const savedSeller = await newSeller.save();
     res.status(200).json(savedSeller);
   } catch (error) {
@@ -294,6 +299,76 @@ export const logoutUser = (req, res) => {
         expires: new Date(0),
       })
       .send();
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+};
+
+export const addToFavorite = async (req, res) => {
+  try {
+    const { onSaleCattleId, userId } = req.body;
+    console.log(onSaleCattleId, userId);
+    if (!onSaleCattleId || !userId) {
+      return res.status(400).json({
+        errorMessage: "Please enter all required fields",
+      });
+    }
+    const user = User.findById(userId);
+    if (!user)
+      return res.status(400).json({
+        errorMessage: "User does not exist",
+      });
+    const check = await Profile.findOne({
+      user: userId,
+      favorites: onSaleCattleId,
+    });
+    if (check)
+      return res.status(400).json({
+        errorMessage: "Already in favorites",
+      });
+    else {
+      const profile = await Profile.findOneAndUpdate(
+        { user: userId },
+        { $push: { favorites: onSaleCattleId } }
+      );
+      await profile.save();
+      return res.status(200).json(profile);
+    }
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+};
+export const removeFromFavorite = async (req, res) => {
+  try {
+    const { onSaleCattleId, userId } = req.body;
+    console.log(onSaleCattleId, userId);
+    if (!onSaleCattleId || !userId) {
+      return res.status(400).json({
+        errorMessage: "Please enter all required fields",
+      });
+    }
+    const user = User.findById(userId);
+    if (!user)
+      return res.status(400).json({
+        errorMessage: "User does not exist",
+      });
+    const check = await Profile.findOne({
+      user: userId,
+      favorites: onSaleCattleId,
+    });
+    if (!check)
+      return res.status(400).json({
+        errorMessage: "Not in favorites",
+      });
+    else {
+      const profile = await Profile.findOneAndUpdate(
+        { user: userId },
+        { $pull: { favorites: onSaleCattleId } }
+      );
+      await profile.save();
+      return res.status(200).json(profile);
+    }
+
   } catch (error) {
     res.status(404).json({ message: error.message });
   }
