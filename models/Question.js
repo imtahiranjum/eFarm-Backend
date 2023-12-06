@@ -4,13 +4,16 @@ const QuestionSchema = new mongoose.Schema(
   {
     subject: {
         type: String,
-        required: true,
     },
 
     description: {
         type: String,
         required: true,
         min: 5
+    },
+
+    answer: {
+        type: String,
     },
 
     user: {
