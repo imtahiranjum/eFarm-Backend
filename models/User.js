@@ -31,6 +31,11 @@ const UserSchema = new mongoose.Schema(
     roles: [{
         type: String  
     }],
+
+    profile: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Profile",
+    },
   },
   
   { timestamps: true }

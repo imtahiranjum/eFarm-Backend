@@ -4,7 +4,7 @@ const SellerSchema = new mongoose.Schema(
   {
     profile: {
       type: Schema.Types.ObjectId,
-      ref: "Profile"
+      ref: "Profile",
     },
 
     name: {
@@ -19,9 +19,14 @@ const SellerSchema = new mongoose.Schema(
     description: {
       type: String,
     },
-    
+
     rating: {
       type: Number,
+    },
+    
+    isBoardingService: {
+      type: Boolean,
+      default: false,
     },
 
     contact_info: {
@@ -52,24 +57,26 @@ const SellerSchema = new mongoose.Schema(
         ref: "ExpiredBoardingService",
       },
     ],
+    
     expired_cattle_on_sale: [
       {
         type: Schema.Types.ObjectId,
         ref: "ExpiredOnSaleCattle",
       },
     ],
-    boarding_services: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "BoardingService",
-      },
-    ],
+
+    boarding_service: {
+      type: Schema.Types.ObjectId,
+      ref: "BoardingService",
+    },
+
     cattle_on_sale: [
       {
         type: Schema.Types.ObjectId,
         ref: "OnSaleCattle",
       },
     ],
+    default: [],
   },
   { timestamps: true }
 );

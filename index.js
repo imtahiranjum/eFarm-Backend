@@ -34,8 +34,8 @@ app.use("/general", generalRoutes);
 app.use("/cattle", cattleRoutes);
 app.use("/user", userRoutes);
 app.use("/onsalecattle", onsalecattleRoutes);
-app.use("/conversation", conversationRoutes);
-app.use("/message", messageRoutes);
+app.use("/conversations", conversationRoutes);
+app.use("/messages", messageRoutes);
 
 
 
@@ -44,7 +44,7 @@ const PORT = process.env.PORT || 9000;
 const io = new Server({
   cors: {
     origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   },
 });
 

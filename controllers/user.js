@@ -15,7 +15,8 @@ export const getUser = async (req, res) => {
       });
     }
 
-    const user = await User.findById(id).populate("profile");
+    const user = await User.findById(id);
+    const profile = await Profile.findOne({ user: user._id });
     if (user === undefined)
       return res.status(401).json({
         errorMessage: "Wrong email or user does not exist on the machine",
@@ -24,7 +25,7 @@ export const getUser = async (req, res) => {
       id: user._id,
       first_name: user.name.first_name,
       email: user.email,
-      profile: user.profile,
+      profile: profile,
     });
   } catch (err) {
     return res.status(400).json({
