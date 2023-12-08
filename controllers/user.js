@@ -24,6 +24,7 @@ export const getUser = async (req, res) => {
     return res.status(200).json({
       id: user._id,
       first_name: user.name.first_name,
+      full_name: user.name.first_name + " " + user.name.last_name,
       email: user.email,
       profile: profile,
     });
@@ -42,7 +43,7 @@ export const getUserByEmail = async (req, res) => {
       });
     }
 
-    const user = await User.findOne({ email: email })
+    const user = await User.findOne({ email: email });
     const profile = await Profile.findOne({ user: user._id });
     if (user === undefined)
       return res.status(400).json({
@@ -51,6 +52,7 @@ export const getUserByEmail = async (req, res) => {
     return res.status(200).json({
       id: user._id,
       first_name: user.name.first_name,
+      full_name: user.name.first_name + " " + user.name.last_name,
       email: user.email,
       roles: user.roles,
       profile: profile,
@@ -369,7 +371,75 @@ export const removeFromFavorite = async (req, res) => {
       await profile.save();
       return res.status(200).json(profile);
     }
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+};
 
+export const changeProfileImage = async (req, res) => {
+  try {
+    const { userId, image } = req.body;
+    if (!userId || !image) {
+      return res.status(400).json({
+        errorMessage: "all required fields not given",
+      });
+    }
+    const user = User.findById(userId);
+    if (!user)
+      return res.status(400).json({
+        errorMessage: "User does not exist",
+      });
+    const profile = await Profile.findOneAndUpdate(
+      { user: userId },
+      { $set: { profile_image: image } }
+    );
+    await profile.save();
+    return res.status(200).json(profile.profile_image);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+};
+
+export const changeProfileBio = async (req, res) => {
+  try {
+    const { userId, bio } = req.body;
+    if (!userId || !bio) {
+      return res.status(400).json({
+        errorMessage: "all required fields not given",
+      });
+    }
+    const user = User.findById(userId);
+    if (!user)
+      return res.status(400).json({
+        errorMessage: "User does not exist",
+      });
+    const profile = await Profile.findOneAndUpdate(
+      { user: userId },
+      { $set: { bio: bio } }
+    );
+    await profile.save();
+    return res.status(200).json(profile.bio);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+};
+export const changeSellerDescription = async (req, res) => {
+  try {
+    const { sellerId, description } = req.body;
+    if (!sellerId || !description) {
+      return res.status(400).json({
+        errorMessage: "all required fields not given",
+      });
+    }
+    const seller = await Seller.findByIdAndUpdate(sellerId, {
+      description: description,
+    });
+    if (!seller)
+      return res.status(400).json({
+        errorMessage: "Seller does not exist",
+      });
+    await seller.save();
+    return res.status(200).json(seller.description);
   } catch (error) {
     res.status(404).json({ message: error.message });
   }
