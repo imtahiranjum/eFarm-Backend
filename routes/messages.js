@@ -4,7 +4,7 @@ import Message from "../models/Message.js";
 const router = express.Router();
 //add
 
-router.post("/", async (req, res) => {
+router.post("/addnewmessage", async (req, res) => {
   const newMessage = new Message(req.body);
 
   try {

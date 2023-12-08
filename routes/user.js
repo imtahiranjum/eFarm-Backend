@@ -1,5 +1,5 @@
 import express from "express";
-import { addToFavorite, createSeller, createUser, getSellerByEmail, getSellerById, getUser, getUserByEmail, loginUser, logoutUser, removeFromFavorite } from "../controllers/user.js";
+import { addToFavorite, changeProfileBio, changeProfileImage, changeSellerDescription, createSeller, createUser, getSellerByEmail, getSellerById, getUser, getUserByEmail, loginUser, logoutUser, removeFromFavorite } from "../controllers/user.js";
 
 const router = express.Router();
 
@@ -11,6 +11,9 @@ router.get("/seller/id/:id", getSellerById);
 router.get("/seller/email/:email", getSellerByEmail);
 router.get("/email/:email", getUserByEmail);
 router.post("/addtofavorite", addToFavorite);
+router.post("/changeprofileimage", changeProfileImage);
+router.post("/changeprofilebio", changeProfileBio);
+router.post("/changesellerdescription", changeSellerDescription);
 router.delete("/removefromfavorite", removeFromFavorite);
 router.post("/logout", logoutUser);
 

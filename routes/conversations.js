@@ -5,9 +5,9 @@ const router = express.Router();
 
 //new conv
 
-router.post("/", async (req, res) => {
+router.post("/addnewconversation", async (req, res) => {
   const newConversation = new Conversation({
-    members: [req.body.senderId, req.body.receiverId],
+    members: [req.body.userId, req.body.sellerId],
   });
 
   try {
