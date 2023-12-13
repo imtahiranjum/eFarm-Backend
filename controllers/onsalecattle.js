@@ -2,6 +2,7 @@ import multer from "multer";
 import Cattle from "../models/Cattle.js";
 import OnSaleCattle from "../models/OnSaleCattle.js";
 import Seller from "../models/Seller.js";
+import Question from "../models/Question.js";
 
 export const getAllOnSaleCattle = async (req, res) => {
   try {
@@ -20,7 +21,9 @@ export const getOneOnSaleCattle = async (req, res) => {
       return res.status(400).json({
         errorMessage: "Please select a cattle",
       });
-    const onSaleCattle = await OnSaleCattle.findById(onSaleCattleId);
+    const onSaleCattle = await OnSaleCattle.findById(onSaleCattleId).populate(
+      "questions"
+    );
 
     res.status(200).json(onSaleCattle);
   } catch (error) {
@@ -41,10 +44,26 @@ export const getOneOnSaleCattle = async (req, res) => {
 export const getOneOnSaleCattleDetails = async (req, res) => {
   try {
     const on_sale_cattle_id = req.params.id;
-    const onSaleCattle = await OnSaleCattle.findById(on_sale_cattle_id);
+    const onSaleCattle = await OnSaleCattle.findById(
+      on_sale_cattle_id
+    ).populate("questions");
     const seller = await Seller.findById(onSaleCattle.seller_info);
 
-    res.status(200).json({seller, onSaleCattle});
+    res.status(200).json({ seller, onSaleCattle });
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+};
+
+export const getQuestions = async (req, res) => {
+  try {
+    const on_sale_cattle_id = req.params.id;
+    const onSaleCattle = await OnSaleCattle.findById(on_sale_cattle_id);
+    const questions = await Question.find()
+      .where("_id")
+      .in(onSaleCattle.questions)
+      .exec();
+    res.status(200).json(questions);
   } catch (error) {
     res.status(404).json({ message: error.message });
   }
@@ -80,10 +99,34 @@ export const updateCattleOnSaleStatus = async (req, res) => {
 
 export const addCattleToSale = async (req, res) => {
   try {
-    const { title, description, price, name, images, gender, age, breed, color, weight, category, seller_info  } = req.body;
+    const {
+      title,
+      description,
+      price,
+      name,
+      images,
+      gender,
+      age,
+      breed,
+      color,
+      weight,
+      category,
+      seller_info,
+    } = req.body;
     console.log(req.body);
 
-    if (!name ||!gender ||!breed ||!color ||!weight ||!category|| !age|| !title|| !description|| !price)
+    if (
+      !name ||
+      !gender ||
+      !breed ||
+      !color ||
+      !weight ||
+      !category ||
+      !age ||
+      !title ||
+      !description ||
+      !price
+    )
       return res.status(400).json({
         errorMessage: "Please fill all the required fields",
       });
@@ -125,7 +168,10 @@ export const addCattleToSale = async (req, res) => {
 
     const savedOnSaleCattle = await newOnSaleCattle.save();
 
-    const sellerUpdate = await Seller.findOneAndUpdate( { _id: seller_info }, { $push: { cattle_on_sale: savedOnSaleCattle._id } } )
+    const sellerUpdate = await Seller.findOneAndUpdate(
+      { _id: seller_info },
+      { $push: { cattle_on_sale: savedOnSaleCattle._id } }
+    );
     await sellerUpdate.save();
 
     res.status(200).json(savedOnSaleCattle);
