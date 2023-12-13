@@ -7,11 +7,11 @@ import Question from "../models/Question.js";
 export const getDashboardStats = async (req, res) => {
   try {
     const users = await User.find({});
-    const cattle = await Cattle.find({});
+
     const onSaleCattle = await OnSaleCattle.find({});
 
     const totalUsers = users.length;
-    const totalCattle = cattle.length;
+
     const totalOnSaleCattle = onSaleCattle.length;
     const totalIndividualSellers = 1;
     const totalFarmSellers = 0;
