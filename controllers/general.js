@@ -9,17 +9,15 @@ export const getDashboardStats = async (req, res) => {
     const users = await User.find({});
 
     const onSaleCattle = await OnSaleCattle.find({});
+    const sellers = await Seller.find({});
 
     const totalUsers = users.length;
 
     const totalOnSaleCattle = onSaleCattle.length;
-    const totalIndividualSellers = 1;
-    const totalFarmSellers = 0;
+    const totalSellers = sellers.length;
 
     res.status(200).json({
-      totalCattle,
-      totalFarmSellers,
-      totalIndividualSellers,
+      totalSellers,
       totalOnSaleCattle,
       totalUsers,
     });
